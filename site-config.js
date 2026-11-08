@@ -3,10 +3,10 @@
   Replace the example values with your real contact details.
 */
 window.SITE_CONFIG = {
-  email: "YOUR_EMAIL@example.com",
+  email: "itzrat159@gmail.com",
   socials: [
-    { label: "GitHub", url: "https://github.com/YOUR_USERNAME" },
-    { label: "Discord", url: "https://discord.com/users/YOUR_USER_ID" },
-    { label: "Roblox", url: "https://www.roblox.com/users/YOUR_USER_ID/profile" }
+    { label: "GitHub", url: "https://github.com/rostilk" },
+    { label: "Discord", url: "https://discord.com/users/1043522088574656562" },
+    { label: "Roblox", url: "https://www.roblox.com/users/2446049316/profile" }
   ]
 };
