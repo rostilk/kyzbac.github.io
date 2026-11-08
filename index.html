@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a0c0f">
+  <meta name="description" content="M1sterFygy — Roblox Luau developer building gameplay systems, tools, and polished player experiences.">
+  <meta property="og:title" content="M1sterFygy — Roblox Luau Developer">
+  <meta property="og:description" content="Gameplay systems, developer tools, and clean Luau architecture.">
+  <meta property="og:type" content="website">
+  <title>M1sterFygy — Roblox Luau Developer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="site-config.js" defer></script>
+  <script src="projects.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="site-noise" aria-hidden="true"></div>
+  <div class="page-grid" aria-hidden="true"></div>
+
+  <header class="site-header" id="top">
+    <a class="brand" href="#top" aria-label="M1sterFygy home">
+      <span class="brand-mark">MF<span>.</span></span>
+      <span class="brand-name">M1STERFYG<span>Y</span></span>
+    </a>
+
+    <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="primary-nav">
+      <span></span><span></span>
+    </button>
+
+    <nav class="primary-nav" id="primary-nav" aria-label="Main navigation">
+      <a href="#work">Work <span>01</span></a>
+      <a href="#about">About <span>02</span></a>
+      <a href="#stack">Stack <span>03</span></a>
+      <a href="#contact">Contact <span>04</span></a>
+    </nav>
+
+    <a class="header-cta" href="#contact">Let's talk <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main>
+    <section class="hero section-wrap" aria-labelledby="hero-title">
+      <div class="hero-copy reveal">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> ROBLOX STUDIO / LUAU DEVELOPMENT</div>
+        <h1 id="hero-title">I build the<br>systems behind<br><span>the experience.</span></h1>
+        <p class="hero-description">I’m <strong>M1sterFygy</strong> — a Roblox Luau developer focused on reliable gameplay systems, thoughtful architecture, and tools that make development faster.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#work">Explore my work <span aria-hidden="true">↘</span></a>
+          <a class="text-link" href="#contact">Get in touch <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="hero-footnote"><span class="tiny-line"></span> OPEN TO SELECT PROJECTS <span class="footnote-divider">/</span> REMOTE</div>
+      </div>
+
+      <div class="hero-art reveal" aria-label="Decorative developer interface illustration">
+        <div class="art-topline"><span>WORKSPACE / 001</span><span>LIVE BUILD <i></i></span></div>
+        <div class="art-orbit orbit-one"></div>
+        <div class="art-orbit orbit-two"></div>
+        <div class="art-cross cross-one"></div>
+        <div class="art-cross cross-two"></div>
+        <div class="art-core"><span class="core-monogram">MF</span><span class="core-caption">LUAU<br>ENGINEER</span></div>
+        <div class="art-float float-top"><span class="float-icon">{ }</span><span><b>MODULAR</b><small>Code architecture</small></span></div>
+        <div class="art-float float-bottom"><span class="float-icon">↗</span><span><b>BUILT TO SCALE</b><small>Systems & tooling</small></span></div>
+        <div class="art-index">KYZBAC <span>—</span> 2026</div>
+      </div>
+
+      <div class="hero-bottomline">
+        <span>INDEPENDENT DEVELOPER</span>
+        <span>GAMEPLAY <b>·</b> SYSTEMS <b>·</b> TOOLING</span>
+        <a href="#work">SCROLL TO EXPLORE <span aria-hidden="true">↓</span></a>
+      </div>
+    </section>
+
+    <section class="work-section section-wrap section-pad" id="work" aria-labelledby="work-title">
+      <div class="section-heading reveal">
+        <div>
+          <div class="eyebrow section-eyebrow">01 / SELECTED WORK</div>
+          <h2 id="work-title">Built with <span>purpose.</span></h2>
+        </div>
+        <p class="section-intro">A selection of systems, tools, and gameplay features. Each project card has a media slot you can connect to a Streamable video or an image.</p>
+      </div>
+
+      <div class="work-toolbar reveal">
+        <div class="filter-list" role="group" aria-label="Filter projects">
+          <button class="filter-button is-active" type="button" data-filter="all">All work <span>00</span></button>
+          <button class="filter-button" type="button" data-filter="gameplay">Gameplay <span>00</span></button>
+          <button class="filter-button" type="button" data-filter="systems">Systems <span>00</span></button>
+          <button class="filter-button" type="button" data-filter="tools">Tools <span>00</span></button>
+        </div>
+        <span class="toolbar-note">PROJECT INDEX <span>↘</span></span>
+      </div>
+
+      <div class="project-grid" id="project-grid" aria-live="polite">
+        <div class="projects-loading">Loading project index<span>...</span></div>
+      </div>
+      <div class="media-hint reveal"><span class="hint-icon">↗</span><p><strong>YOUR WORK, YOUR PROOF.</strong> Replace each preview template in <code>projects.js</code> with a Streamable URL or direct image link. No stock or generated imagery is used on this site.</p></div>
+    </section>
+
+    <section class="about-section section-wrap section-pad" id="about" aria-labelledby="about-title">
+      <div class="section-heading reveal">
+        <div>
+          <div class="eyebrow section-eyebrow">02 / THE DEVELOPER</div>
+          <h2 id="about-title">Technical by nature.<br><span>Intentional by design.</span></h2>
+        </div>
+        <div class="about-stamp"><span>MF</span><small>INDEPENDENT<br>DEVELOPER</small></div>
+      </div>
+
+      <div class="about-layout">
+        <div class="about-main reveal">
+          <p class="about-lead">I care about what happens under the surface — how systems communicate, how code scales, and how small technical decisions shape the player experience.</p>
+          <p class="about-body">My work is centered around Roblox development with Luau. I build features from the ground up, structure code into reusable modules, and refine existing systems with maintainability and performance in mind.</p>
+          <p class="about-body">Whether it’s a combat mechanic, an NPC behavior system, a custom interface, or a Studio plugin, my goal stays the same: make it work reliably, keep it understandable, and leave it easy to extend.</p>
+          <a class="text-link about-link" href="#contact">Have a project in mind? <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="principles reveal">
+          <div class="principle-row"><span class="principle-number">01</span><div><h3>Clear architecture</h3><p>Reusable modules, separation of concerns, and code that remains readable as a project grows.</p></div><span class="principle-symbol">⌘</span></div>
+          <div class="principle-row"><span class="principle-number">02</span><div><h3>Reliable systems</h3><p>Considered edge cases, predictable behavior, and server-side validation where it matters.</p></div><span class="principle-symbol">◈</span></div>
+          <div class="principle-row"><span class="principle-number">03</span><div><h3>Useful details</h3><p>Responsive feedback, clean interfaces, and small refinements that improve the whole experience.</p></div><span class="principle-symbol">↗</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stack-section section-wrap section-pad" id="stack" aria-labelledby="stack-title">
+      <div class="stack-header reveal">
+        <div>
+          <div class="eyebrow section-eyebrow">03 / CAPABILITIES</div>
+          <h2 id="stack-title">The tools of <span>the trade.</span></h2>
+        </div>
+        <p class="section-intro">A practical toolkit for building, debugging, and shipping Roblox experiences.</p>
+      </div>
+
+      <div class="stack-grid reveal">
+        <article class="stack-card stack-card-featured">
+          <div class="stack-card-top"><span>01 / CORE</span><span class="stack-card-mark">{ }</span></div>
+          <h3>Luau<br>development</h3>
+          <p>Gameplay scripting, object-oriented patterns, metatables, asynchronous logic, and modular codebases.</p>
+          <div class="stack-tags"><span>Luau</span><span>OOP</span><span>Metatables</span><span>Async</span></div>
+        </article>
+        <article class="stack-card">
+          <div class="stack-card-top"><span>02 / ARCHITECTURE</span><span class="stack-card-mark">◫</span></div>
+          <h3>System<br>design</h3>
+          <p>Reusable frameworks, service-based architecture, data flow, and maintainable systems.</p>
+          <div class="stack-tags"><span>Modules</span><span>Design patterns</span><span>Optimization</span></div>
+        </article>
+        <article class="stack-card">
+          <div class="stack-card-top"><span>03 / EXPERIENCE</span><span class="stack-card-mark">⌁</span></div>
+          <h3>Gameplay<br>& UI</h3>
+          <p>Combat, NPCs, inventory, matchmaking, dialogue, character customization, and interface behavior.</p>
+          <div class="stack-tags"><span>Combat</span><span>NPC AI</span><span>UI</span><span>Animation</span></div>
+        </article>
+        <article class="stack-card">
+          <div class="stack-card-top"><span>04 / WORKFLOW</span><span class="stack-card-mark">↗</span></div>
+          <h3>Tools &<br>optimization</h3>
+          <p>Studio plugins, debugging, profiling, workflow improvements, and performance-focused refinement.</p>
+          <div class="stack-tags"><span>Roblox Studio</span><span>Plugins</span><span>Debugging</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="contact-section section-wrap section-pad" id="contact" aria-labelledby="contact-title">
+      <div class="contact-panel reveal">
+        <div class="contact-orbit" aria-hidden="true"></div>
+        <div class="eyebrow section-eyebrow">04 / CONTACT</div>
+        <h2 id="contact-title">Have something<br><span>worth building?</span></h2>
+        <div class="contact-bottom">
+          <p>For commissions, collaborations, or questions about my work, reach out through one of the channels below.</p>
+          <div class="contact-actions" id="contact-actions">
+            <a class="button button-primary" id="email-link" href="mailto:YOUR_EMAIL@example.com">Start a conversation <span aria-hidden="true">↗</span></a>
+            <div class="social-links" id="social-links"></div>
+          </div>
+        </div>
+        <div class="contact-watermark">MF<span>.</span></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer section-wrap">
+    <a class="brand footer-brand" href="#top"><span class="brand-mark">MF<span>.</span></span><span class="brand-name">M1STERFYG<span>Y</span></span></a>
+    <span class="footer-note">DESIGNED & BUILT BY M1STERFYG<span>Y</span></span>
+    <a class="back-top" href="#top">BACK TO TOP <span aria-hidden="true">↑</span></a>
+    <span class="copyright">© <span id="current-year">2026</span></span>
+  </footer>
+
+  <div class="project-modal" id="project-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-panel" role="document">
+      <button class="modal-close" type="button" aria-label="Close project preview" data-close-modal>×</button>
+      <div class="modal-media" id="modal-media"></div>
+      <div class="modal-content">
+        <div class="eyebrow" id="modal-category">PROJECT / PREVIEW</div>
+        <h2 id="modal-title">Project title</h2>
+        <p id="modal-description"></p>
+        <div class="modal-meta"><span>MY CONTRIBUTION</span><p id="modal-role"></p></div>
+        <div class="modal-tags" id="modal-tags"></div>
+        <a class="modal-external-link" id="modal-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Open project link <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

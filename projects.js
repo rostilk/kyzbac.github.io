@@ -1,0 +1,99 @@
+/*
+  PROJECT CONTENT + PREVIEW TEMPLATES
+  -----------------------------------
+  For each project, edit `preview`:
+
+  1) Streamable video:
+     preview: { type: "video", url: "https://streamable.com/YOUR_VIDEO_ID" }
+     You can paste either the normal Streamable share link or its /e/ embed link.
+
+  2) PNG / JPG / WEBP image:
+     preview: { type: "image", url: "https://your-image-host.com/preview.png" }
+     You can also use a local file, e.g. "assets/previews/combat-system.png".
+
+  3) No preview yet:
+     preview: { type: "video", url: "" }
+     The site will show a clean placeholder until you add a link.
+
+  Keep the project `id` unique. Set `category` to: "gameplay", "systems", or "tools".
+*/
+window.PORTFOLIO_PROJECTS = [
+  {
+    id: "quickcomplete",
+    number: "01",
+    title: "QuickComplete",
+    subtitle: "Roblox Studio plugin",
+    category: "tools",
+    featured: true,
+    description: "A code-completion plugin designed to speed up scripting workflows in Roblox Studio. It focuses on resolving service and ModuleScript paths, suggesting module references, and reducing repetitive navigation while writing Luau.",
+    contribution: "Plugin architecture, autocomplete logic, path resolution, module discovery, and interface implementation.",
+    tags: ["Luau", "Studio Plugin", "Autocomplete", "Developer Tools"],
+    preview: { type: "video", url: "" },
+    projectUrl: ""
+  },
+  {
+    id: "combat-framework",
+    number: "02",
+    title: "Combat Framework",
+    subtitle: "Gameplay mechanics",
+    category: "gameplay",
+    featured: false,
+    description: "A modular foundation for responsive combat mechanics. The project is a place to demonstrate attack flow, ability logic, hit detection, state handling, and the feedback that makes combat feel consistent.",
+    contribution: "Combat logic, reusable modules, ability flow, and gameplay integration.",
+    tags: ["Combat", "Gameplay", "Modular Design", "Luau"],
+    preview: { type: "video", url: "" },
+    projectUrl: ""
+  },
+  {
+    id: "dungeon-generator",
+    number: "03",
+    title: "Dungeon Generator",
+    subtitle: "Procedural generation",
+    category: "systems",
+    featured: false,
+    description: "A room-based dungeon generation system that places connected rooms and hallways while validating spatial fit and connection points. A good showcase for procedural placement, constraints, and generation edge cases.",
+    contribution: "Room placement logic, connection validation, distance selection, and generation flow.",
+    tags: ["Procedural Generation", "Geometry", "World Building", "Luau"],
+    preview: { type: "image", url: "" },
+    projectUrl: ""
+  },
+  {
+    id: "smart-npc",
+    number: "04",
+    title: "Smart NPC System",
+    subtitle: "AI & behavior",
+    category: "gameplay",
+    featured: false,
+    description: "An NPC behavior system built to organize decision-making, movement, and reactions into understandable parts. Use this preview slot to show behavior states, navigation, or an in-game demonstration.",
+    contribution: "NPC behavior, state logic, movement handling, and system structure.",
+    tags: ["NPC AI", "Pathfinding", "State Logic", "Luau"],
+    preview: { type: "video", url: "" },
+    projectUrl: ""
+  },
+  {
+    id: "character-customizer",
+    number: "05",
+    title: "Character Customizer",
+    subtitle: "UI & player systems",
+    category: "systems",
+    featured: false,
+    description: "A character customization flow with slot selection, appearance categories, gender-specific assets, viewport previews, and saved player choices. Designed around clear data ownership and a cohesive user experience.",
+    contribution: "Customization logic, slot flow, appearance handling, viewport behavior, and data integration.",
+    tags: ["UI", "Player Data", "ViewportFrame", "Customization"],
+    preview: { type: "image", url: "" },
+    projectUrl: ""
+  },
+  {
+    id: "inventory-hotbar",
+    number: "06",
+    title: "Inventory & Hotbar",
+    subtitle: "Player interface",
+    category: "gameplay",
+    featured: false,
+    description: "A custom inventory and hotbar experience focused on item organization, responsive UI behavior, and clean interaction between player input and game systems.",
+    contribution: "Inventory behavior, hotbar interactions, UI scripting, and system integration.",
+    tags: ["Inventory", "Hotbar", "UI Scripting", "Luau"],
+    preview: { type: "image", url: "" },
+    projectUrl: ""
+  }
+];
