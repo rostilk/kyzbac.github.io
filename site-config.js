@@ -1,7 +1,3 @@
-/*
-  EDIT YOUR PERSONAL LINKS HERE.
-  Replace the example values with your real contact details.
-*/
 window.SITE_CONFIG = {
   email: "itzrat159@gmail.com",
   socials: [
