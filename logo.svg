@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 144" role="img" aria-label="Kyzbac logo">
+  <rect x="4" y="4" width="136" height="136" rx="29" fill="#0b0e0c"/>
+  <rect x="4.75" y="4.75" width="134.5" height="134.5" rx="28.25" fill="none" stroke="#303a32" stroke-width="1.5"/>
+  <path d="M39 31h21v34.5L99 31h30L82.5 72.5 129 113H99L60 84.5V113H39z" fill="#c8f169"/>
+  <text x="166" y="91" fill="#f2f4ed" font-family="Inter, Arial, sans-serif" font-size="66" font-weight="750" letter-spacing="-3">KYZBAC</text>
+  <rect x="168" y="108" width="54" height="4" rx="2" fill="#c8f169"/>
+  <text x="235" y="115" fill="#929b91" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="600" letter-spacing="3">LUAU DEVELOPER</text>
+</svg>

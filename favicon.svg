@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Kyzbac K monogram">
+  <rect x="4" y="4" width="120" height="120" rx="27" fill="#0b0e0c"/>
+  <rect x="4.75" y="4.75" width="118.5" height="118.5" rx="26.25" fill="none" stroke="#303a32" stroke-width="1.5"/>
+  <path d="M35 25h19v31.5L91 25h27L74.5 63.8 118 103H91L54 75.8V103H35z" fill="#c8f169"/>
+  <path d="M82 63.5 96.5 76.5" fill="none" stroke="#0b0e0c" stroke-width="5" stroke-linecap="round" opacity=".0"/>
+</svg>
