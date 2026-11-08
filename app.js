@@ -98,7 +98,7 @@
 
     modalMedia.innerHTML = "";
     if (!previewConfigured(project)) {
-      modalMedia.innerHTML = `<div class="modal-empty"><span class="modal-empty-mark">${escapeHTML(project.number || "00")}</span><span class="eyebrow">PREVIEW NOT CONNECTED</span><p>Open <code>projects.js</code> and paste a Streamable URL or direct PNG/JPG/WEBP link into this project's <code>preview.url</code> field.</p></div>`;
+      modalMedia.innerHTML = `<div class="modal-empty"><span class="modal-empty-mark">${escapeHTML(project.number || "00")}</span><span class="eyebrow">PREVIEW NOT CONNECTED</span><p></p></div>`;
     } else if (project.preview.type === "image") {
       const image = document.createElement("img");
       image.src = project.preview.url;
