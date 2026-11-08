@@ -179,17 +179,25 @@
   function setupContact() {
     const emailLink = document.querySelector("#email-link");
     const socialLinks = document.querySelector("#social-links");
-    if (isConfiguredUrl(config.email) && emailLink) {
-      emailLink.href = `mailto:${config.email}`;
-    } else if (emailLink) {
-      emailLink.href = "mailto:YOUR_EMAIL@example.com";
+
+    const discord = config.socials?.find(
+        (item) => item.label.toLowerCase() === "discord" && isConfiguredUrl(item.url)
+    );
+
+    if (emailLink && discord) {
+        emailLink.href = discord.url;
+        emailLink.target = "_blank";
+        emailLink.rel = "noopener noreferrer";
     }
+
     if (socialLinks) {
-      socialLinks.innerHTML = (Array.isArray(config.socials) ? config.socials : []).filter((item) => item && isConfiguredUrl(item.url)).map((item) =>
-        `<a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.label)} <span aria-hidden="true">↗</span></a>`
-      ).join("");
+        socialLinks.innerHTML = (Array.isArray(config.socials) ? config.socials : [])
+            .filter((item) => item && isConfiguredUrl(item.url))
+            .map((item) =>
+                `<a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.label)} <span aria-hidden="true">↗</span></a>`
+            ).join("");
     }
-  }
+}
 
   function setupNavigation() {
     if (!menuToggle || !nav) return;
