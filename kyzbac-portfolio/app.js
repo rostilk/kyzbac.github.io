@@ -41,7 +41,7 @@
         <div class="placeholder-corner placeholder-corner-tl"></div><div class="placeholder-corner placeholder-corner-br"></div>
         <span class="placeholder-index">MEDIA SLOT / ${escapeHTML(project.number || "00")}</span>
         <span class="placeholder-symbol">${escapeHTML(project.number || "↗")}</span>
-        <span class="placeholder-bottom"><b>PREVIEW TEMPLATE</b><small>ADD LINK IN PROJECTS.JS</small></span>
+        <span class="placeholder-bottom"><b>PREVIEW TEMPLATE</b><small>NONE.JS</small></span>
       </div>`;
     }
 
