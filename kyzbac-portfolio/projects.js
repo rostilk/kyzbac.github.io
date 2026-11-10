@@ -1,22 +1,4 @@
-/*
-  PROJECT CONTENT + PREVIEW TEMPLATES
-  -----------------------------------
-  For each project, edit `preview`:
 
-  1) Streamable video:
-     preview: { type: "video", url: "https://streamable.com/YOUR_VIDEO_ID" }
-     You can paste either the normal Streamable share link or its /e/ embed link.
-
-  2) PNG / JPG / WEBP image:
-     preview: { type: "image", url: "https://your-image-host.com/preview.png" }
-     You can also use a local file, e.g. "assets/previews/combat-system.png".
-
-  3) No preview yet:
-     preview: { type: "video", url: "" }
-     The site will show a clean placeholder until you add a link.
-
-  Keep the project `id` unique. Set `category` to: "gameplay", "systems", or "tools".
-*/
 window.PORTFOLIO_PROJECTS = [
   {
     id: "quickcomplete",
@@ -28,7 +10,7 @@ window.PORTFOLIO_PROJECTS = [
     description: "A code-completion plugin designed to speed up scripting workflows in Roblox Studio. It focuses on resolving service and ModuleScript paths, suggesting module references, and reducing repetitive navigation while writing Luau.",
     contribution: "Plugin architecture, autocomplete logic, path resolution, module discovery, and interface implementation.",
     tags: ["Luau", "Studio Plugin", "Autocomplete", "Developer Tools"],
-    preview: { type: "video", url: "" },
+    preview: { type: "video", url: "https://streamable.com/0ig1dr" },
     projectUrl: ""
   },
   {
