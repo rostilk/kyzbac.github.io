@@ -22,7 +22,7 @@ window.PORTFOLIO_PROJECTS = [
     description: "A modular foundation for responsive combat mechanics. The project is a place to demonstrate attack flow, ability logic, hit detection, state handling, and the feedback that makes combat feel consistent.",
     contribution: "Combat logic, reusable modules, ability flow, and gameplay integration.",
     tags: ["Combat", "Gameplay", "Modular Design", "Luau"],
-    preview: { type: "image", url: "https://medal.tv/games/roblox-studio/clips/mmZZ3iWDyVyXJVRkW?invite=cr-MSxPbDQsNTgzMDUwNjkz" },
+    preview: { type: "image", url: "https://cdn.medal.tv/ugcc/screenshot/GcAJVDPQP_MHe5yVSB8nLw.png?auth=exp=1794339000~data=NTgzMDUwNjkzLG1tWlozaVdEeVZ5WEpWUmtXLGI2SjhGcXMxS3QsMTAyNjA5NTA5OQ~hmac=b4d1c25419a26b833fd840fdd27e440b2ae84a413ed44d1e0bc58c755d61e2b3&type=original&_gl=1*128n2il*_gcl_au*ODkzMzcwOTIwLjE3OTQwNzYxNzE.*_ga*MTgxMDQxNzMzNS4xNzk0MDc2MTcx*_ga_RKTT7KQC04*czE3OTQzMTcwMzUkbzIkZzEkdDE3OTQzMTc0NTgkajYwJGwwJGgw" },
     projectUrl: ""
   },
   {
