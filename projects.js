@@ -9,7 +9,7 @@ window.PORTFOLIO_PROJECTS = [
     description: "A code-completion plugin designed to speed up scripting workflows in Roblox Studio. It focuses on resolving service and ModuleScript paths, suggesting module references, and reducing repetitive navigation while writing Luau.",
     contribution: "Plugin architecture, autocomplete logic, path resolution, module discovery, and interface implementation.",
     tags: ["Luau", "Studio Plugin", "Autocomplete", "Developer Tools"],
-    preview: { type: "video", url: "https://streamable.com/0ig1dr" },
+    preview: { type: "video", url: "https://streamable.com/yl2iyd" },
     projectUrl: ""
   },
   {
