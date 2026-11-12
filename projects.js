@@ -10,7 +10,7 @@ window.PORTFOLIO_PROJECTS = [
     contribution: "Plugin architecture, autocomplete logic, path resolution, module discovery, and interface implementation.",
     tags: ["Luau", "Studio Plugin", "Autocomplete", "Developer Tools"],
     preview: { type: "video", url: "https://streamable.com/yl2iyd" },
-    projectUrl: ""
+    projectUrl: "https://create.roblox.com/store/asset/99045076619029/QuickComplete-TestRelease-version-06?viewFromStudio=true&keyword=&searchId=a9359455-afa9-4cc8-91c5-3af1c62aa2e3"
   },
   {
     id: "combat-framework",
@@ -22,7 +22,7 @@ window.PORTFOLIO_PROJECTS = [
     description: "A modular foundation for responsive combat mechanics. The project is a place to demonstrate attack flow, ability logic, hit detection, state handling, and the feedback that makes combat feel consistent.",
     contribution: "Combat logic, reusable modules, ability flow, and gameplay integration.",
     tags: ["Combat", "Gameplay", "Modular Design", "Luau"],
-    preview: { type: "image", url: "https://cdn.medal.tv/ugcc/screenshot/GcAJVDPQP_MHe5yVSB8nLw.png?auth=exp=1794339000~data=NTgzMDUwNjkzLG1tWlozaVdEeVZ5WEpWUmtXLGI2SjhGcXMxS3QsMTAyNjA5NTA5OQ~hmac=b4d1c25419a26b833fd840fdd27e440b2ae84a413ed44d1e0bc58c755d61e2b3&type=original&_gl=1*128n2il*_gcl_au*ODkzMzcwOTIwLjE3OTQwNzYxNzE.*_ga*MTgxMDQxNzMzNS4xNzk0MDc2MTcx*_ga_RKTT7KQC04*czE3OTQzMTcwMzUkbzIkZzEkdDE3OTQzMTc0NTgkajYwJGwwJGgw" },
+    preview: { type: "video", url: "https://streamable.com/w8iw1w" },
     projectUrl: ""
   },
   {
