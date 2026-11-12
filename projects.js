@@ -61,7 +61,7 @@ window.PORTFOLIO_PROJECTS = [
     description: "A character customization flow with slot selection, appearance categories, gender-specific assets, viewport previews, and saved player choices. Designed around clear data ownership and a cohesive user experience.",
     contribution: "Customization logic, slot flow, appearance handling, viewport behavior, and data integration.",
     tags: ["UI", "Player Data", "ViewportFrame", "Customization"],
-    preview: { type: "image", url: "" },
+    preview: { type: "video", url: "https://streamable.com/q3lzik" },
     projectUrl: ""
   },
   {
