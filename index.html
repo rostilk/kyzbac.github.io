@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="en">
 
-<link rel="icon" type="image/svg+xml" href="./favicon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
-<link rel="shortcut icon" href="./favicon.ico">
-<link rel="apple-touch-icon" href="./apple-touch-icon.png">
   
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0a0c0f">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+<link rel="shortcut icon" href="./favicon.ico">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <meta name="description" content="Kyzbac - Roblox Luau developer building gameplay systems, tools, and polished player experiences.">
   <meta property="og:title" content="Kyzbac - Roblox Luau Developer">
   <meta property="og:description" content="Gameplay systems, developer tools, and clean Luau architecture.">
@@ -19,8 +19,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="site-enhancements.css">
   <script src="site-config.js" defer></script>
   <script src="projects.js" defer></script>
+  <script src="reviews-config.js" defer></script>
+  <script src="reviews.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -41,7 +44,9 @@
       <a href="#work">Work <span>01</span></a>
       <a href="#about">About <span>02</span></a>
       <a href="#stack">Stack <span>03</span></a>
-      <a href="#contact">Contact <span>04</span></a>
+      <a href="#reviews">Reviews <span>04</span></a>
+      <a href="pricing.html">Pricing <span>05</span></a>
+      <a href="#contact">Contact <span>06</span></a>
     </nav>
 
     <a class="header-cta" href="#contact">Let's talk <span aria-hidden="true">↗</span></a>
@@ -171,10 +176,46 @@
       </div>
     </section>
 
+    <section class="reviews-section section-wrap section-pad" id="reviews" aria-labelledby="reviews-title">
+      <div class="reviews-header review-reveal">
+        <div>
+          <div class="eyebrow section-eyebrow">04 / CLIENT FEEDBACK</div>
+          <h2 id="reviews-title">Built on trust.<br><span>Backed by feedback.</span></h2>
+        </div>
+        <p class="reviews-intro">Honest feedback from people I have worked with. Reviews are published after moderation so the rating reflects real, approved submissions.</p>
+      </div>
+
+      <div class="reviews-layout">
+        <div class="reviews-feed" id="reviews-list" aria-live="polite">
+          <div class="reviews-empty"><span class="reviews-empty-mark" aria-hidden="true">✳</span><div><strong>Loading client feedback…</strong><p>Approved reviews will appear here.</p></div></div>
+        </div>
+
+        <aside class="review-form-panel review-reveal" aria-labelledby="review-form-title">
+          <h3 class="review-form-title" id="review-form-title">Leave a review</h3>
+          <p class="review-form-description">Worked together? Share your experience. Your review will appear publicly after approval.</p>
+          <form class="review-form" id="review-form">
+            <div class="review-field"><label for="review-name">Your name</label><input id="review-name" name="name" type="text" minlength="2" maxlength="60" autocomplete="name" placeholder="Name or display name" required></div>
+            <div class="review-field"><label for="review-project-name">Project (optional)</label><input id="review-project-name" name="project" type="text" maxlength="100" placeholder="What did we work on?"></div>
+            <fieldset class="rating-fieldset"><legend>Your rating</legend><div class="star-picker" id="review-star-picker" role="group" aria-label="Choose a rating from one to five stars">
+              <button type="button" data-rating="1" aria-label="1 star" aria-pressed="false">★</button>
+              <button type="button" data-rating="2" aria-label="2 stars" aria-pressed="false">★</button>
+              <button type="button" data-rating="3" aria-label="3 stars" aria-pressed="false">★</button>
+              <button type="button" data-rating="4" aria-label="4 stars" aria-pressed="false">★</button>
+              <button type="button" data-rating="5" aria-label="5 stars" aria-pressed="false">★</button>
+            </div><input id="review-rating" name="rating" type="hidden" value=""></fieldset>
+            <div class="review-field"><label for="review-message">Your experience</label><textarea id="review-message" name="message" minlength="10" maxlength="1200" placeholder="What was it like working together?" required></textarea></div>
+            <div class="review-honeypot" aria-hidden="true"><label for="review-website">Leave this field empty</label><input id="review-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+            <button class="button button-primary review-submit" type="submit">Submit review <span aria-hidden="true">↗</span></button>
+            <p id="review-form-status" role="status" aria-live="polite">Submissions are reviewed before appearing publicly.</p>
+          </form>
+        </aside>
+      </div>
+    </section>
+
     <section class="contact-section section-wrap section-pad" id="contact" aria-labelledby="contact-title">
       <div class="contact-panel reveal">
         <div class="contact-orbit" aria-hidden="true"></div>
-        <div class="eyebrow section-eyebrow">04 / CONTACT</div>
+        <div class="eyebrow section-eyebrow">05 / CONTACT</div>
         <h2 id="contact-title">Have something<br><span>worth building?</span></h2>
         <div class="contact-bottom">
           <p>For commissions, collaborations, or questions about my work, reach out through one of the channels below.</p>
