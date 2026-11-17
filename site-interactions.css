@@ -1,0 +1,211 @@
+/* Kyzbac visual interactions — desktop-only cursor, magnetic controls and card lighting. */
+
+/* The system pointer remains enabled on touch devices and when reduced motion is requested. */
+@media (hover: hover) and (pointer: fine) {
+  body.has-custom-cursor,
+  body.has-custom-cursor a,
+  body.has-custom-cursor button,
+  body.has-custom-cursor [role="button"] {
+    cursor: none;
+  }
+
+  body.has-custom-cursor input,
+  body.has-custom-cursor textarea,
+  body.has-custom-cursor [contenteditable="true"] {
+    cursor: text;
+  }
+
+  .site-cursor-ring,
+  .site-cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 120;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform, opacity, width, height;
+  }
+
+  .site-cursor-ring {
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(199, 243, 107, .58);
+    border-radius: 50%;
+    background: rgba(199, 243, 107, .035);
+    box-shadow: 0 0 20px rgba(199, 243, 107, .07), inset 0 0 12px rgba(199, 243, 107, .035);
+    transition: width .2s ease, height .2s ease, border-color .2s ease, background .2s ease, opacity .2s ease;
+  }
+
+  .site-cursor-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #c7f36b;
+    box-shadow: 0 0 12px rgba(199, 243, 107, .6);
+    transition: opacity .2s ease, scale .2s ease;
+  }
+
+  .site-cursor-ring.is-visible,
+  .site-cursor-dot.is-visible { opacity: 1; }
+  .site-cursor-ring.is-hovering {
+    width: 52px;
+    height: 52px;
+    border-color: rgba(199, 243, 107, .92);
+    background: rgba(199, 243, 107, .075);
+  }
+  .site-cursor-ring.is-hovering + .site-cursor-dot { scale: .6; }
+
+  .is-magnetic {
+    translate: var(--magnet-x, 0px) var(--magnet-y, 0px);
+    transition-property: translate, transform, color, background-color, border-color;
+    transition-duration: .22s;
+    transition-timing-function: cubic-bezier(.2, .7, .2, 1);
+  }
+
+  .project-card.is-tilting,
+  .stack-card.is-tilting,
+  .price-card.is-tilting,
+  .review-card.is-tilting {
+    transform: perspective(1050px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(-4px);
+    transform-style: preserve-3d;
+    border-color: rgba(199, 243, 107, .46);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .28), 0 0 32px rgba(199, 243, 107, .035);
+  }
+
+  .project-card,
+  .stack-card,
+  .price-card,
+  .review-card {
+    position: relative;
+    overflow: hidden;
+    transform-style: preserve-3d;
+  }
+
+  .project-card::before,
+  .stack-card::before,
+  .price-card::before,
+  .review-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(300px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(199, 243, 107, .09), transparent 72%);
+    transition: opacity .25s ease;
+  }
+
+  .project-card.is-tilting::before,
+  .stack-card.is-tilting::before,
+  .price-card.is-tilting::before,
+  .review-card.is-tilting::before { opacity: 1; }
+
+  .project-card > .project-open,
+  .stack-card > *,
+  .price-card > *,
+  .review-card > * { position: relative; z-index: 2; }
+}
+
+/* Discord identity inside the review form and published review cards. */
+.review-discord-gate {
+  display: grid;
+  gap: 13px;
+  padding: 15px;
+  border: 1px solid rgba(199, 243, 107, .2);
+  background: linear-gradient(135deg, rgba(199, 243, 107, .055), rgba(9, 13, 15, .48));
+}
+.review-discord-gate-copy { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.75; }
+.review-discord-gate-copy strong { color: var(--text); font-weight: 600; }
+.review-discord-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 43px;
+  border: 1px solid rgba(199, 243, 107, .38);
+  background: rgba(199, 243, 107, .09);
+  color: var(--text);
+  font: 10px var(--mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  transition: transform .2s ease, border-color .2s ease, background .2s ease;
+  cursor: pointer;
+}
+.review-discord-login:hover { transform: translateY(-2px); border-color: var(--accent); background: rgba(199, 243, 107, .15); }
+.review-discord-login:disabled { opacity: .5; cursor: wait; }
+.review-discord-login-mark { color: var(--accent); font-size: 17px; }
+.review-discord-profile {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+.review-discord-profile[hidden] { display: none; }
+.review-discord-profile-avatar {
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(199, 243, 107, .48);
+  border-radius: 50%;
+  object-fit: cover;
+  background: #151c19;
+}
+.review-discord-profile-copy { display: grid; min-width: 0; gap: 3px; }
+.review-discord-profile-copy strong { overflow: hidden; color: var(--text); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.review-discord-profile-copy small { overflow: hidden; color: var(--muted); font: 8px var(--mono); text-overflow: ellipsis; white-space: nowrap; }
+.review-discord-logout {
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font: 8px var(--mono);
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease;
+}
+.review-discord-logout:hover { color: var(--accent); border-color: rgba(199, 243, 107, .45); }
+.review-form-fields {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.review-form-fields[hidden] { display: none; }
+.review-form-fields:disabled { opacity: .45; }
+.review-discord-id-note { margin: 0; color: var(--muted-dark); font: 8px var(--mono); letter-spacing: .07em; }
+.review-avatar-image {
+  width: 37px;
+  height: 37px;
+  flex: 0 0 37px;
+  border: 1px solid rgba(199, 243, 107, .28);
+  border-radius: 50%;
+  object-fit: cover;
+  background: #151c19;
+}
+.review-author-copy { display: grid; min-width: 0; gap: 3px; }
+.review-author-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.review-discord-handle { color: var(--muted-dark); font: 8px var(--mono); }
+.review-discord-check {
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+  place-items: center;
+  border: 1px solid rgba(199, 243, 107, .25);
+  border-radius: 50%;
+  color: var(--accent);
+  font-size: 10px;
+}
+
+@media (max-width: 720px) {
+  .review-discord-profile { grid-template-columns: 38px minmax(0, 1fr); }
+  .review-discord-profile-avatar { width: 38px; height: 38px; }
+  .review-discord-logout { grid-column: 2; justify-self: start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-cursor-ring, .site-cursor-dot { display: none !important; }
+  .is-magnetic { translate: none !important; }
+}

@@ -20,6 +20,10 @@
     "Content-Type": "application/json"
   };
 
+  let authClient = null;
+  let currentSession = null;
+  let currentDiscordProfile = null;
+
   function starString(rating) {
     const rounded = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
     return `${"★".repeat(rounded)}${"☆".repeat(5 - rounded)}`;
@@ -30,7 +34,7 @@
     const dock = document.createElement("a");
     dock.id = "review-rating-dock";
     dock.className = "review-rating-dock";
-    dock.href = document.querySelector("#reviews") ? "#reviews" : "./index.html#reviews";
+    dock.href = $("#reviews") ? "#reviews" : "./index.html#reviews";
     dock.setAttribute("aria-label", "See client reviews and leave a review");
     dock.innerHTML = `
       <span class="dock-stars" aria-hidden="true">★★★★★</span>
@@ -63,6 +67,17 @@
     if (dockStars) dockStars.textContent = count ? starString(average) : "☆☆☆☆☆";
   }
 
+  function safeDiscordAvatar(value) {
+    if (typeof value !== "string" || !value) return "";
+    try {
+      const url = new URL(value);
+      const allowedPath = url.pathname.startsWith("/avatars/") || url.pathname.startsWith("/embed/avatars/");
+      return url.protocol === "https:" && url.hostname === "cdn.discordapp.com" && allowedPath ? url.href : "";
+    } catch {
+      return "";
+    }
+  }
+
   function renderReviews(reviews) {
     const list = $("#reviews-list");
     if (!list) return;
@@ -80,7 +95,14 @@
       const dateText = date && !Number.isNaN(date.valueOf())
         ? new Intl.DateTimeFormat(undefined, { month: "short", year: "numeric" }).format(date)
         : "";
+      const displayName = review.discord_global_name || review.discord_username || review.name || "Discord user";
+      const username = review.discord_username ? `@${review.discord_username}` : "";
       const project = review.project ? `<span class="review-project">${escapeHTML(review.project)}</span>` : "";
+      const avatarUrl = safeDiscordAvatar(review.discord_avatar_url);
+      const avatar = avatarUrl
+        ? `<img class="review-avatar-image" src="${escapeHTML(avatarUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer">`
+        : `<span class="review-avatar" aria-hidden="true">${escapeHTML(displayName.trim().charAt(0).toUpperCase() || "?")}</span>`;
+
       return `
         <article class="review-card">
           <div class="review-card-top">
@@ -88,7 +110,15 @@
             <time>${escapeHTML(dateText)}</time>
           </div>
           <p class="review-message">“${escapeHTML(review.message)}”</p>
-          <div class="review-author"><span class="review-avatar" aria-hidden="true">${escapeHTML((review.name || "?").trim().charAt(0).toUpperCase())}</span><span><strong>${escapeHTML(review.name)}</strong>${project}</span></div>
+          <div class="review-author">
+            ${avatar}
+            <span class="review-author-copy">
+              <strong>${escapeHTML(displayName)}</strong>
+              ${username ? `<small class="review-discord-handle">${escapeHTML(username)} · Discord</small>` : `<small class="review-discord-handle">Discord account</small>`}
+              ${project}
+            </span>
+            <span class="review-discord-check" aria-label="Discord identity verified" title="Discord identity verified">✓</span>
+          </div>
         </article>`;
     }).join("");
   }
@@ -96,7 +126,7 @@
   async function loadReviews() {
     const list = $("#reviews-list");
     if (!configured) {
-      if (list) list.innerHTML = `<div class="reviews-setup-note"><strong>Review feed not connected yet.</strong><p>Add your Supabase URL and anon key in <code>reviews-config.js</code>, then run <code>reviews-schema.sql</code>.</p></div>`;
+      if (list) list.innerHTML = `<div class="reviews-setup-note"><strong>Review feed not connected yet.</strong><p>Add your Supabase URL and publishable/anon key in <code>reviews-config.js</code>, then run the review SQL setup.</p></div>`;
       setSummary([]);
       const dockCount = $("#dock-rating-count");
       if (dockCount) dockCount.textContent = "Review setup pending";
@@ -105,7 +135,8 @@
 
     try {
       const limit = Math.max(1, Math.min(Number(config.statsLimit) || 5000, 5000));
-      const response = await fetch(`${endpoint}?select=id,name,project,rating,message,created_at&status=eq.approved&order=created_at.desc&limit=${limit}`, {
+      const select = "id,name,project,rating,message,created_at,discord_user_id,discord_username,discord_global_name,discord_avatar_url";
+      const response = await fetch(`${endpoint}?select=${select}&status=eq.approved&order=created_at.desc&limit=${limit}`, {
         headers: { apikey: key, Authorization: `Bearer ${key}` },
         cache: "no-store"
       });
@@ -114,10 +145,168 @@
       setSummary(reviews);
       renderReviews(reviews);
     } catch (error) {
-      if (list) list.innerHTML = `<div class="reviews-setup-note"><strong>Reviews could not be loaded.</strong><p>Check the Supabase URL, anon key, table name, and Row Level Security policies.</p></div>`;
+      if (list) list.innerHTML = `<div class="reviews-setup-note"><strong>Reviews could not be loaded.</strong><p>Check the Supabase URL, public key, table columns, and Row Level Security policies.</p></div>`;
       setSummary([]);
       console.error("Kyzbac reviews:", error);
     }
+  }
+
+  function buildDiscordAvatar(profile) {
+    if (profile.avatar) {
+      const extension = profile.avatar.startsWith("a_") ? "gif" : "png";
+      return `https://cdn.discordapp.com/avatars/${encodeURIComponent(profile.id)}/${encodeURIComponent(profile.avatar)}.${extension}?size=128`;
+    }
+    try {
+      const defaultIndex = Number((BigInt(profile.id) >> 22n) % 6n);
+      return `https://cdn.discordapp.com/embed/avatars/${defaultIndex}.png`;
+    } catch {
+      return "https://cdn.discordapp.com/embed/avatars/0.png";
+    }
+  }
+
+  function extractDiscordProfile(user) {
+    if (!user) return null;
+    const identity = Array.isArray(user.identities)
+      ? user.identities.find((item) => item.provider === "discord")
+      : null;
+    if (!identity) return null;
+
+    const data = identity.identity_data || {};
+    const id = String(identity.provider_id || data.id || data.sub || "");
+    const username = String(data.username || data.preferred_username || "");
+    const globalName = String(data.global_name || data.name || data.full_name || "");
+    const avatar = typeof data.avatar === "string" ? data.avatar : "";
+    if (!/^\d{15,22}$/.test(id) || !username) return null;
+
+    return {
+      id,
+      username,
+      displayName: globalName || username,
+      avatar,
+      avatarUrl: buildDiscordAvatar({ id, avatar })
+    };
+  }
+
+  function setProfileUI(profile) {
+    const gate = $("#review-discord-gate");
+    const profilePanel = $("#review-discord-profile");
+    const fields = $("#review-form-fields");
+    const loginButton = $("#review-discord-login");
+    const logoutButton = $("#review-discord-logout");
+    const status = $("#review-form-status");
+    const avatar = $("#review-discord-avatar");
+    const name = $("#review-discord-name");
+    const username = $("#review-discord-username");
+    const id = $("#review-discord-id");
+
+    if (!gate || !fields) return;
+    currentDiscordProfile = profile;
+    fields.disabled = !profile;
+    fields.hidden = !profile;
+    if (loginButton) loginButton.hidden = Boolean(profile);
+    if (logoutButton) logoutButton.hidden = !profile;
+    if (profilePanel) profilePanel.hidden = !profile;
+
+    if (profile) {
+      if (avatar) {
+        avatar.src = profile.avatarUrl;
+        avatar.alt = `${profile.displayName} Discord avatar`;
+      }
+      if (name) name.textContent = profile.displayName;
+      if (username) username.textContent = `@${profile.username}`;
+      if (id) id.textContent = `DISCORD ID · ${profile.id}`;
+      if (status) status.textContent = "Discord connected. Your verified display name and avatar will be attached to the review.";
+    } else {
+      if (avatar) avatar.removeAttribute("src");
+      if (status) status.textContent = "Connect Discord to unlock the review form. Your Discord ID, display name, and avatar are attached automatically.";
+    }
+  }
+
+  async function refreshDiscordSession() {
+    if (!authClient) {
+      setProfileUI(null);
+      const status = $("#review-form-status");
+      if (status) status.textContent = "Discord sign-in is unavailable until Supabase and its Discord provider are configured.";
+      return;
+    }
+
+    try {
+      const { data, error } = await authClient.auth.getUser();
+      if (error) throw error;
+      currentSession = (await authClient.auth.getSession()).data.session;
+      setProfileUI(extractDiscordProfile(data.user));
+    } catch (error) {
+      currentSession = null;
+      setProfileUI(null);
+      console.error("Kyzbac Discord session:", error);
+    }
+  }
+
+  function setupDiscordAuth() {
+    const form = $("#review-form");
+    if (!form) return;
+    const status = $("#review-form-status");
+    const loginButton = $("#review-discord-login");
+    const logoutButton = $("#review-discord-logout");
+
+    if (!configured || !window.supabase?.createClient) {
+      setProfileUI(null);
+      const submit = form.querySelector('[type="submit"]');
+      if (submit) submit.disabled = true;
+      if (status) status.textContent = !configured
+        ? "Review submissions will be enabled after Supabase is configured."
+        : "Supabase Auth could not load. Check the browser connection to the Supabase CDN.";
+      return;
+    }
+
+    authClient = window.supabase.createClient(root, key, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      }
+    });
+
+    authClient.auth.onAuthStateChange((_event, session) => {
+      currentSession = session || null;
+      setProfileUI(extractDiscordProfile(session?.user));
+    });
+
+    loginButton?.addEventListener("click", async () => {
+      loginButton.disabled = true;
+      if (status) status.textContent = "Opening Discord authorization…";
+      try {
+        const { error } = await authClient.auth.signInWithOAuth({
+          provider: "discord",
+          options: {
+            scopes: "identify",
+            redirectTo: window.location.href
+          }
+        });
+        if (error) throw error;
+      } catch (error) {
+        if (status) status.textContent = "Discord sign-in could not start. Check the Supabase Discord provider and redirect URLs.";
+        console.error("Kyzbac Discord sign-in:", error);
+        loginButton.disabled = false;
+      }
+    });
+
+    logoutButton?.addEventListener("click", async () => {
+      logoutButton.disabled = true;
+      try {
+        const { error } = await authClient.auth.signOut();
+        if (error) throw error;
+        currentSession = null;
+        setProfileUI(null);
+      } catch (error) {
+        if (status) status.textContent = "Discord could not be disconnected. Please try again.";
+        console.error("Kyzbac Discord sign-out:", error);
+      } finally {
+        logoutButton.disabled = false;
+      }
+    });
+
+    void refreshDiscordSession();
   }
 
   function setupRatingPicker() {
@@ -149,28 +338,35 @@
     if (!form) return;
     const status = $("#review-form-status");
     const submit = form.querySelector('[type="submit"]');
+    const fields = $("#review-form-fields", form);
     const rating = $("#review-rating", form);
-
-    if (!configured) {
-      submit.disabled = true;
-      if (status) status.textContent = "Review submissions will be enabled after the review backend is configured.";
-      return;
-    }
+    if (!configured || !authClient) return;
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (status) status.textContent = "";
-
-      // A hidden honeypot helps discard basic automated form spam.
       if (form.elements.website?.value) return;
-      if (!rating.value) {
+      if (!currentDiscordProfile || !fields || fields.disabled) {
+        if (status) status.textContent = "Connect your Discord account before submitting a review.";
+        return;
+      }
+      if (!rating?.value) {
         if (status) status.textContent = "Please select a star rating.";
         return;
       }
       if (!form.reportValidity()) return;
 
+      const { data: sessionData, error: sessionError } = await authClient.auth.getSession();
+      if (sessionError || !sessionData.session?.access_token) {
+        setProfileUI(null);
+        if (status) status.textContent = "Your Discord session expired. Connect Discord again before submitting.";
+        return;
+      }
+      currentSession = sessionData.session;
+
+      // The SQL trigger reads the Discord identity from auth.identities. The browser
+      // sends only the review content, never a client-supplied name or avatar.
       const payload = {
-        name: form.elements.name.value.trim(),
         project: form.elements.project.value.trim(),
         rating: Number(rating.value),
         message: form.elements.message.value.trim(),
@@ -183,7 +379,11 @@
       try {
         const response = await fetch(endpoint, {
           method: "POST",
-          headers: { ...headers, Prefer: "return=minimal" },
+          headers: {
+            ...headers,
+            Authorization: `Bearer ${currentSession.access_token}`,
+            Prefer: "return=minimal"
+          },
           body: JSON.stringify(payload)
         });
         if (!response.ok) {
@@ -191,19 +391,26 @@
           throw new Error(detail || `Review service returned ${response.status}`);
         }
         form.reset();
-        rating.value = "";
-        form.querySelectorAll("#review-star-picker [data-rating]").forEach((button) => {
-          button.classList.remove("is-selected");
-          button.setAttribute("aria-pressed", "false");
-        });
-        if (status) status.textContent = "Thank you. Your review was received and will appear after moderation.";
+        if (status) status.textContent = "Thank you. Your Discord-linked review was received and is waiting for approval.";
+        if (fields) fields.disabled = false;
+        if (fields) fields.hidden = false;
+        pickerReset();
       } catch (error) {
-        if (status) status.textContent = "Your review could not be sent. Please try again in a moment.";
+        if (status) status.textContent = "Your review could not be sent. Check the Discord review migration and try again.";
         console.error("Kyzbac review submission:", error);
       } finally {
         submit.disabled = false;
         submit.classList.remove("is-loading");
       }
+    });
+  }
+
+  function pickerReset() {
+    const hidden = $("#review-rating");
+    if (hidden) hidden.value = "";
+    $("#review-star-picker")?.querySelectorAll("[data-rating]").forEach((button) => {
+      button.classList.remove("is-selected");
+      button.setAttribute("aria-pressed", "false");
     });
   }
 
@@ -244,6 +451,7 @@
   }
 
   createDock();
+  setupDiscordAuth();
   setupRatingPicker();
   setupForm();
   setupMotion();
