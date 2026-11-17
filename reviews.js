@@ -98,7 +98,14 @@
       const displayName = review.discord_global_name || review.discord_username || review.name || "Discord user";
       const username = review.discord_username ? `@${review.discord_username}` : "";
       const project = review.project ? `<span class="review-project">${escapeHTML(review.project)}</span>` : "";
-      const avatarUrl = safeDiscordAvatar(review.discord_avatar_url);
+      // Prefer the verified Discord avatar hash over a cached/default URL.
+      // This also repairs older rows whose URL was saved as Discord's default avatar.
+      const discordId = String(review.discord_user_id || "");
+      const avatarHash = String(review.discord_avatar_hash || "");
+      const hashedAvatarUrl = /^\\d{15,22}$/.test(discordId) && /^[a-zA-Z0-9_]{1,128}$/.test(avatarHash)
+        ? `https://cdn.discordapp.com/avatars/${encodeURIComponent(discordId)}/${encodeURIComponent(avatarHash)}.${avatarHash.startsWith("a_") ? "gif" : "png"}?size=128`
+        : "";
+      const avatarUrl = hashedAvatarUrl || safeDiscordAvatar(review.discord_avatar_url);
       const avatar = avatarUrl
         ? `<img class="review-avatar-image" src="${escapeHTML(avatarUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer">`
         : `<span class="review-avatar" aria-hidden="true">${escapeHTML(displayName.trim().charAt(0).toUpperCase() || "?")}</span>`;
@@ -135,7 +142,7 @@
 
     try {
       const limit = Math.max(1, Math.min(Number(config.statsLimit) || 5000, 5000));
-      const select = "id,name,project,rating,message,created_at,discord_user_id,discord_username,discord_global_name,discord_avatar_url";
+      const select = "id,name,project,rating,message,created_at,discord_user_id,discord_username,discord_global_name,discord_avatar_hash,discord_avatar_url";
       const response = await fetch(`${endpoint}?select=${select}&status=eq.approved&order=created_at.desc&limit=${limit}`, {
         headers: { apikey: key, Authorization: `Bearer ${key}` },
         cache: "no-store"
