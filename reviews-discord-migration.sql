@@ -26,7 +26,9 @@ declare
   v_user_id uuid;
   v_discord_id text;
   v_identity_data jsonb;
+  v_user_metadata jsonb;
   v_avatar_hash text;
+  v_avatar_url text;
   v_avatar_extension text;
   v_default_avatar integer;
 begin
@@ -35,9 +37,14 @@ begin
     raise exception 'Discord sign-in is required to submit a review.';
   end if;
 
-  select discord_identity.provider_id, discord_identity.identity_data
-    into v_discord_id, v_identity_data
+  select
+    discord_identity.provider_id,
+    coalesce(discord_identity.identity_data, '{}'::jsonb),
+    coalesce(discord_user.raw_user_meta_data, '{}'::jsonb)
+    into v_discord_id, v_identity_data, v_user_metadata
   from auth.identities as discord_identity
+  join auth.users as discord_user
+    on discord_user.id = discord_identity.user_id
   where discord_identity.user_id = v_user_id
     and discord_identity.provider = 'discord'
   order by discord_identity.last_sign_in_at desc nulls last
@@ -48,18 +55,38 @@ begin
   end if;
 
   v_identity_data := coalesce(v_identity_data, '{}'::jsonb);
-  v_avatar_hash := nullif(v_identity_data ->> 'avatar', '');
+  v_user_metadata := coalesce(v_user_metadata, '{}'::jsonb);
+
+  -- Supabase may place Discord avatar fields on identity_data OR user_metadata.
+  v_avatar_hash := nullif(coalesce(
+    v_identity_data ->> 'avatar',
+    v_user_metadata ->> 'avatar',
+    v_identity_data ->> 'avatar_hash',
+    v_user_metadata ->> 'avatar_hash'
+  ), '');
+  v_avatar_url := nullif(coalesce(
+    v_identity_data ->> 'avatar_url',
+    v_identity_data ->> 'picture',
+    v_user_metadata ->> 'avatar_url',
+    v_user_metadata ->> 'picture'
+  ), '');
 
   new.user_id := v_user_id;
   new.discord_user_id := v_discord_id;
   new.discord_username := coalesce(
     nullif(v_identity_data ->> 'username', ''),
-    nullif(v_identity_data ->> 'preferred_username', '')
+    nullif(v_user_metadata ->> 'username', ''),
+    nullif(v_identity_data ->> 'preferred_username', ''),
+    nullif(v_user_metadata ->> 'preferred_username', '')
   );
   new.discord_global_name := coalesce(
     nullif(v_identity_data ->> 'global_name', ''),
+    nullif(v_user_metadata ->> 'global_name', ''),
+    nullif(v_user_metadata ->> 'display_name', ''),
     nullif(v_identity_data ->> 'name', ''),
-    nullif(v_identity_data ->> 'full_name', '')
+    nullif(v_user_metadata ->> 'name', ''),
+    nullif(v_identity_data ->> 'full_name', ''),
+    nullif(v_user_metadata ->> 'full_name', '')
   );
   new.discord_avatar_hash := v_avatar_hash;
   new.name := coalesce(new.discord_global_name, new.discord_username, 'Discord user');
@@ -72,6 +99,9 @@ begin
       v_avatar_hash,
       v_avatar_extension
     );
+  elsif v_avatar_url like 'https://cdn.discordapp.com/avatars/%'
+     or v_avatar_url like 'https://cdn.discordapp.com/embed/avatars/%' then
+    new.discord_avatar_url := v_avatar_url;
   else
     v_default_avatar := ((v_discord_id::bigint >> 22) % 6)::integer;
     new.discord_avatar_url := format(
@@ -115,6 +145,65 @@ create policy "Authenticated users can submit pending reviews"
 revoke all on table public.portfolio_reviews from anon, authenticated;
 grant select on table public.portfolio_reviews to anon, authenticated;
 grant insert on table public.portfolio_reviews to authenticated;
+
+
+-- Repair existing review rows using the same trusted Discord metadata sources.
+-- This preserves review content and status; it only refreshes identity presentation fields.
+with discord_profiles as (
+  select
+    discord_identity.user_id,
+    discord_identity.provider_id,
+    coalesce(discord_identity.identity_data, '{}'::jsonb) as identity_data,
+    coalesce(discord_user.raw_user_meta_data, '{}'::jsonb) as user_metadata
+  from auth.identities as discord_identity
+  join auth.users as discord_user
+    on discord_user.id = discord_identity.user_id
+  where discord_identity.provider = 'discord'
+),
+profile_values as (
+  select
+    review.id,
+    profile.provider_id,
+    nullif(coalesce(
+      profile.identity_data ->> 'avatar',
+      profile.user_metadata ->> 'avatar',
+      profile.identity_data ->> 'avatar_hash',
+      profile.user_metadata ->> 'avatar_hash'
+    ), '') as avatar_hash,
+    nullif(coalesce(
+      profile.identity_data ->> 'avatar_url',
+      profile.identity_data ->> 'picture',
+      profile.user_metadata ->> 'avatar_url',
+      profile.user_metadata ->> 'picture'
+    ), '') as avatar_url
+  from public.portfolio_reviews as review
+  join discord_profiles as profile
+    on profile.user_id = review.user_id
+   and profile.provider_id = review.discord_user_id
+  where review.user_id is not null
+)
+update public.portfolio_reviews as review
+set
+  discord_avatar_hash = coalesce(values.avatar_hash, review.discord_avatar_hash),
+  discord_avatar_url = case
+    when values.avatar_hash is not null then format(
+      'https://cdn.discordapp.com/avatars/%s/%s.%s?size=128',
+      review.discord_user_id,
+      values.avatar_hash,
+      case when left(values.avatar_hash, 2) = 'a_' then 'gif' else 'png' end
+    )
+    when values.avatar_url like 'https://cdn.discordapp.com/avatars/%'
+      or values.avatar_url like 'https://cdn.discordapp.com/embed/avatars/%'
+      then values.avatar_url
+    else review.discord_avatar_url
+  end
+from profile_values as values
+where review.id = values.id
+  and (
+    values.avatar_hash is not null
+    or values.avatar_url like 'https://cdn.discordapp.com/avatars/%'
+    or values.avatar_url like 'https://cdn.discordapp.com/embed/avatars/%'
+  );
 
 -- No public UPDATE or DELETE policy is created. Approve/reject reviews from
 -- Supabase Table Editor; the browser cannot approve its own submission.
