@@ -42,7 +42,9 @@
     pointerY = event.clientY;
     ring.classList.add("is-visible");
     dot.classList.add("is-visible");
-    dot.style.transform = `translate3d(${pointerX}px, ${pointerY}px, 0) translate(-50%, -50%)`;
+    // Use fixed viewport coordinates; keep transform and hover scaling in CSS.
+    dot.style.left = `${pointerX}px`;
+    dot.style.top = `${pointerY}px`;
     if (!animationFrame) animationFrame = window.requestAnimationFrame(drawCursor);
   }, { passive: true });
 
