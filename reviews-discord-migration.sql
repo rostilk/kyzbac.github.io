@@ -184,25 +184,25 @@ profile_values as (
 )
 update public.portfolio_reviews as review
 set
-  discord_avatar_hash = coalesce(values.avatar_hash, review.discord_avatar_hash),
+  discord_avatar_hash = coalesce(profile_data.avatar_hash, review.discord_avatar_hash),
   discord_avatar_url = case
-    when values.avatar_hash is not null then format(
+    when profile_data.avatar_hash is not null then format(
       'https://cdn.discordapp.com/avatars/%s/%s.%s?size=128',
       review.discord_user_id,
-      values.avatar_hash,
-      case when left(values.avatar_hash, 2) = 'a_' then 'gif' else 'png' end
+      profile_data.avatar_hash,
+      case when left(profile_data.avatar_hash, 2) = 'a_' then 'gif' else 'png' end
     )
-    when values.avatar_url like 'https://cdn.discordapp.com/avatars/%'
-      or values.avatar_url like 'https://cdn.discordapp.com/embed/avatars/%'
-      then values.avatar_url
+    when profile_data.avatar_url like 'https://cdn.discordapp.com/avatars/%'
+      or profile_data.avatar_url like 'https://cdn.discordapp.com/embed/avatars/%'
+      then profile_data.avatar_url
     else review.discord_avatar_url
   end
-from profile_values as values
-where review.id = values.id
+from profile_values as profile_data
+where review.id = profile_data.id
   and (
-    values.avatar_hash is not null
-    or values.avatar_url like 'https://cdn.discordapp.com/avatars/%'
-    or values.avatar_url like 'https://cdn.discordapp.com/embed/avatars/%'
+    profile_data.avatar_hash is not null
+    or profile_data.avatar_url like 'https://cdn.discordapp.com/avatars/%'
+    or profile_data.avatar_url like 'https://cdn.discordapp.com/embed/avatars/%'
   );
 
 -- No public UPDATE or DELETE policy is created. Approve/reject reviews from
