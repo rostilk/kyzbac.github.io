@@ -152,38 +152,63 @@
   }
 
   function buildDiscordAvatar(profile) {
-    if (profile.avatar) {
-      const extension = profile.avatar.startsWith("a_") ? "gif" : "png";
-      return `https://cdn.discordapp.com/avatars/${encodeURIComponent(profile.id)}/${encodeURIComponent(profile.avatar)}.${extension}?size=128`;
+    const directUrl = safeDiscordAvatar(profile.avatarUrl || profile.avatar_url || profile.picture || "");
+    if (directUrl) return directUrl;
+
+    const avatarHash = String(profile.avatar || profile.avatar_hash || "");
+    if (avatarHash && /^\d{15,22}$/.test(String(profile.id))) {
+      const extension = avatarHash.startsWith("a_") ? "gif" : "png";
+      return "https://cdn.discordapp.com/avatars/" + encodeURIComponent(profile.id) + "/" + encodeURIComponent(avatarHash) + "." + extension + "?size=128";
     }
+
     try {
       const defaultIndex = Number((BigInt(profile.id) >> 22n) % 6n);
-      return `https://cdn.discordapp.com/embed/avatars/${defaultIndex}.png`;
+      return "https://cdn.discordapp.com/embed/avatars/" + defaultIndex + ".png";
     } catch {
       return "https://cdn.discordapp.com/embed/avatars/0.png";
     }
   }
 
-  function extractDiscordProfile(user) {
+  function extractDiscordProfile(user, extraIdentities = []) {
     if (!user) return null;
-    const identity = Array.isArray(user.identities)
-      ? user.identities.find((item) => item.provider === "discord")
-      : null;
-    if (!identity) return null;
 
-    const data = identity.identity_data || {};
-    const id = String(identity.provider_id || data.id || data.sub || "");
-    const username = String(data.username || data.preferred_username || "");
-    const globalName = String(data.global_name || data.name || data.full_name || "");
-    const avatar = typeof data.avatar === "string" ? data.avatar : "";
-    if (!/^\d{15,22}$/.test(id) || !username) return null;
+    const identities = [
+      ...(Array.isArray(user.identities) ? user.identities : []),
+      ...(Array.isArray(extraIdentities) ? extraIdentities : [])
+    ];
+    const identity = identities.find((item) => item?.provider === "discord") || null;
+    const providers = Array.isArray(user.app_metadata?.providers) ? user.app_metadata.providers : [];
+    const isDiscordUser = Boolean(
+      identity || user.app_metadata?.provider === "discord" || providers.includes("discord")
+    );
+    if (!isDiscordUser) return null;
+
+    // Supabase can expose provider fields on identity_data or user_metadata.
+    const data = { ...(user.user_metadata || {}), ...(identity?.identity_data || {}) };
+    const id = String(
+      identity?.provider_id || data.provider_id || data.id || data.sub || data.user_id || ""
+    );
+    if (!/^\d{15,22}$/.test(id)) return null;
+
+    const username = String(
+      data.username || data.preferred_username || data.user_name || ("discord-" + id.slice(-6))
+    );
+    const globalName = String(
+      data.global_name || data.globalName || data.display_name || data.name || data.full_name || ""
+    );
+    const avatar = typeof data.avatar === "string"
+      ? data.avatar
+      : typeof data.avatar_hash === "string" ? data.avatar_hash : "";
+    const avatarUrl = typeof data.avatar_url === "string"
+      ? data.avatar_url
+      : typeof data.picture === "string" ? data.picture : "";
 
     return {
       id,
       username,
       displayName: globalName || username,
       avatar,
-      avatarUrl: buildDiscordAvatar({ id, avatar })
+      avatarUrl: buildDiscordAvatar({ id, avatar, avatarUrl })
     };
   }
 
@@ -210,11 +235,11 @@
     if (profile) {
       if (avatar) {
         avatar.src = profile.avatarUrl;
-        avatar.alt = `${profile.displayName} Discord avatar`;
+        avatar.alt = profile.displayName + " Discord avatar";
       }
       if (name) name.textContent = profile.displayName;
-      if (username) username.textContent = `@${profile.username}`;
-      if (id) id.textContent = `DISCORD ID · ${profile.id}`;
+      if (username) username.textContent = "@" + profile.username;
+      if (id) id.textContent = "DISCORD ID · " + profile.id;
       if (status) status.textContent = "Discord connected. Your verified display name and avatar will be attached to the review.";
     } else {
       if (avatar) avatar.removeAttribute("src");
@@ -222,23 +247,58 @@
     }
   }
 
+  function clearOAuthCallbackParameters() {
+    const url = new URL(window.location.href);
+    ["code", "error", "error_description", "error_code", "state"].forEach((key) => {
+      url.searchParams.delete(key);
+    });
+    window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+  }
+
   async function refreshDiscordSession() {
     if (!authClient) {
       setProfileUI(null);
       const status = $("#review-form-status");
       if (status) status.textContent = "Discord sign-in is unavailable until Supabase and its Discord provider are configured.";
-      return;
+      return null;
     }
 
     try {
-      const { data, error } = await authClient.auth.getUser();
-      if (error) throw error;
-      currentSession = (await authClient.auth.getSession()).data.session;
-      setProfileUI(extractDiscordProfile(data.user));
+      const { data: sessionData, error: sessionError } = await authClient.auth.getSession();
+      if (sessionError) throw sessionError;
+      currentSession = sessionData.session || null;
+      if (!currentSession) {
+        setProfileUI(null);
+        return null;
+      }
+
+      let user = currentSession.user;
+      const { data: userData, error: userError } = await authClient.auth.getUser(currentSession.access_token);
+      if (!userError && userData?.user) user = userData.user;
+
+      let identities = Array.isArray(user?.identities) ? user.identities : [];
+      if (!identities.some((identity) => identity?.provider === "discord")
+        && typeof authClient.auth.getUserIdentities === "function") {
+        const { data: identityData, error: identityError } = await authClient.auth.getUserIdentities();
+        if (!identityError && Array.isArray(identityData?.identities)) {
+          identities = identityData.identities;
+        }
+      }
+
+      const profile = extractDiscordProfile(user, identities);
+      setProfileUI(profile);
+      if (!profile) {
+        const status = $("#review-form-status");
+        if (status) status.textContent = "Supabase has a session, but the Discord profile was not returned. Check that Discord is listed under Authentication → Users → your user → Identities, then try signing in again.";
+      }
+      return profile;
     } catch (error) {
       currentSession = null;
       setProfileUI(null);
+      const status = $("#review-form-status");
+      if (status) status.textContent = "Could not restore your Discord session. Please try connecting again.";
       console.error("Kyzbac Discord session:", error);
+      return null;
     }
   }
 
@@ -259,33 +319,82 @@
       return;
     }
 
+    // Exchange the OAuth PKCE callback explicitly before checking the session.
     authClient = window.supabase.createClient(root, key, {
       auth: {
         autoRefreshToken: true,
         persistSession: true,
-        detectSessionInUrl: true
+        detectSessionInUrl: false,
+        flowType: "pkce"
       }
     });
 
     authClient.auth.onAuthStateChange((_event, session) => {
       currentSession = session || null;
-      setProfileUI(extractDiscordProfile(session?.user));
+      if (!session) {
+        setProfileUI(null);
+        return;
+      }
+      const provisionalProfile = extractDiscordProfile(session.user);
+      if (provisionalProfile) setProfileUI(provisionalProfile);
+      // Do not await Supabase API calls inside onAuthStateChange.
+      window.setTimeout(() => { void refreshDiscordSession(); }, 0);
     });
+
+    async function completeOAuthCallback() {
+      const callbackUrl = new URL(window.location.href);
+      const code = callbackUrl.searchParams.get("code");
+      const callbackError = callbackUrl.searchParams.get("error_description")
+        || callbackUrl.searchParams.get("error");
+
+      if (callbackError) {
+        clearOAuthCallbackParameters();
+        if (status) status.textContent = "Discord authorization failed: " + callbackError;
+        return;
+      }
+
+      if (code) {
+        if (loginButton) loginButton.disabled = true;
+        if (status) status.textContent = "Finishing Discord sign-in…";
+        try {
+          const { data, error } = await authClient.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+          currentSession = data.session || null;
+          clearOAuthCallbackParameters();
+          const profile = await refreshDiscordSession();
+          if (loginButton) loginButton.disabled = false;
+          if (!profile && status) {
+            status.textContent = "Discord authorization completed, but Supabase did not return a Discord identity. Check Authentication → Users → Identities in Supabase.";
+          }
+        } catch (error) {
+          clearOAuthCallbackParameters();
+          if (status) status.textContent = "Discord sign-in could not be completed: " + (error.message || "OAuth callback error") + ". Try connecting again.";
+          console.error("Kyzbac Discord callback:", error);
+          if (loginButton) loginButton.disabled = false;
+        }
+        return;
+      }
+
+      if (loginButton) loginButton.disabled = false;
+      await refreshDiscordSession();
+    }
 
     loginButton?.addEventListener("click", async () => {
       loginButton.disabled = true;
       if (status) status.textContent = "Opening Discord authorization…";
       try {
+        const redirectUrl = new URL(window.location.pathname, window.location.origin);
+        redirectUrl.hash = "reviews";
         const { error } = await authClient.auth.signInWithOAuth({
           provider: "discord",
           options: {
             scopes: "identify",
-            redirectTo: window.location.href
+            redirectTo: redirectUrl.href
           }
         });
         if (error) throw error;
       } catch (error) {
-        if (status) status.textContent = "Discord sign-in could not start. Check the Supabase Discord provider and redirect URLs.";
+        if (status) status.textContent = "Discord sign-in could not start: " + (error.message || "provider configuration error") + ".";
         console.error("Kyzbac Discord sign-in:", error);
         loginButton.disabled = false;
       }
@@ -306,7 +415,7 @@
       }
     });
 
-    void refreshDiscordSession();
+    void completeOAuthCallback();
   }
 
   function setupRatingPicker() {
