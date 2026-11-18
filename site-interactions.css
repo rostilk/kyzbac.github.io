@@ -1,6 +1,3 @@
-/* Kyzbac visual interactions — desktop-only cursor, magnetic controls and card lighting. */
-
-/* The system pointer remains enabled on touch devices and when reduced motion is requested. */
 @media (hover: hover) and (pointer: fine) {
   body.has-custom-cursor,
   body.has-custom-cursor a,
